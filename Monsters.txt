@@ -1,0 +1,175 @@
+//            AUTHOR-->>    YADAV_JI
+ 
+#include "bits/stdc++.h"
+using namespace std;
+// using i64 = int64_t;
+// constexpr i64 mod = 998244353;
+#define int               int64_t
+#define PB                push_back
+#define POB              pop_back
+#define PF                push_front
+#define POF              pop_front
+#define all(x)            (x).begin(),(x).end()
+#define uniq(v)           (v).erase(unique(all(v)),(v).end())
+#define sz(x)             (int)((x).size())
+#define F                first
+#define S                second
+#define pii               pair<int,int>
+#define FRi(b)          for(int i=0;i<b;i++)
+#define FRj(b)          for(int j=0;j<b;j++)
+#define fro(b)         for(int i=1;i<b;i++)
+#define frr(b)         for(int i=b;i>=0;i--)
+#define prDouble(x) cout << fixed << setprecision(10) << x
+#define newline              cout<<'\n';
+#define mem1(a)           memset(a,-1,sizeof(a))
+#define mem0(a)           memset(a,0,sizeof(a))
+#define MAXN 1000001
+#define mod  998244353
+
+typedef pair<int, int> pi;
+int n,m;
+vector<int>v;
+int a,b,c,d;
+int spf[MAXN]; 
+void seiv() {
+     for(int i= 1;i<MAXN;i++) spf[i] = i; for(int i=4;i<MAXN;i+=2) spf[i] = 2;
+    for(int i= 3;i*i<=MAXN;i++) { if(spf[i] == i) { for(int j=i*i;j<MAXN;j+=i) { 
+        if(spf [j] == j) spf[j] = i;
+            }
+         }
+     }
+}
+vector<int>  getfactor(int x) {
+    vector<int>factor; while(x != 1) { factor.push_back(spf[x]); x = x / spf[x]; } return factor;
+}
+
+int N_Choose_K(int n, int k, int mode) {
+        if(k == 1) return n;
+        if(n-k == 1) return n;
+        if(n == k) return 1;
+        return (N_Choose_K(n-1,k,mode) + N_Choose_K(n-1,k-1,mode)) % mode;
+    }
+int binpow(int  A, int N, int M) {
+    int res = 1;
+    for(;N;N >>= 1) {
+        if(N &1) res = (res * A) % M; A = (A * A) % M;
+    }
+    return res ;
+}
+// If the first elements are equal, then sort by second element in decreasing order.
+  auto cmp1 = [](const pair<int, int>& a, const pair<int, int>& b) {
+    return a.first < b.first || (a.first == b.first && a.second < b.second);
+  };
+// If the first elements are equal, then sort by second element in increasing order.
+  auto cmp2 = [](const pair<int, int>& a, const pair<int, int>& b) {
+    return a.first < b.first || (a.first == b.first && a.second > b.second);
+  };
+
+
+void SAKSHAM(int test){    
+    cin >> n >> m;
+    vector<string>s(n);
+    FRi(n) cin >> s[i];
+    vector<vector<int>>dp(n,vector<int>(m,INT_MAX));
+    queue<pii>q;
+    pii p1 ;
+    queue<pair<pii,string>>qq;
+    for(int i = 0;i < n;i++) {
+        for(int j = 0;j < m;j++) {
+            if(s[i][j] == 'M') {q.push({i,j});}
+            if(s[i][j] == 'A') {qq.push({{i,j},""});}
+        } 
+    }
+    int cnt = 0;
+    while(q.size()) {
+        int si = q.size();
+        while(si--) {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
+            dp[x][y] = cnt;
+            int row[4] = {0,0,-1,1};
+            int col[4] = {-1,1,0,0};
+            for(int k = 0;k < 4;k++) {
+                int rr = row[k] + x;
+                int cc = col[k] + y;
+                if(rr >= 0 && rr < n && cc >= 0 && cc < m && dp[rr][cc] == INT_MAX && s[rr][cc] != '#') {
+                    dp[rr][cc] = cnt;
+                    q.push({rr,cc});
+                }
+            }
+        }
+        cnt++;
+    }
+    
+    bool ok = false;
+    string ans = "";
+    cnt = 1;
+    
+    while(qq.size() && (!ok)) {
+        int si = qq.size();
+        while(si--) {
+            int x = qq.front().first.first;
+            int y = qq.front().first.second;
+            string temp = qq.front().second;
+            qq.pop();
+            int row[4] = {0,0,-1,1}; 
+            int col[4] = {-1,1,0,0};
+            // dp[x][y] = -1;
+            s[x][y] = '#';
+            string dir = "LRUD";
+            if(x == 0 || y == 0 || x == n-1 || y == m-1) {
+                ok = true;
+                ans = temp;
+                break;
+            }
+            for(int k = 0;k < 4;k++) {
+                int rr = row[k] + x;
+                int cc = col[k] + y;
+                if(rr >= 0 && rr < n && cc >= 0 && cc < m && dp[rr][cc] > cnt && s[rr][cc] != '#') {
+                    
+                    string temp1 = temp+dir[k];
+                    // dp[rr][cc] = -1;
+                    s[rr][cc] = '#';
+                    qq.push({{rr,cc},temp1});
+                }
+            }
+        }
+        cnt++;
+    }
+    // for(int i = 0;i < n; ++i) {
+    //     for(int j = 0; j<m; ++j) cout<<dp[i][j]<<" ";cout<<endl;
+    // }
+    if(ok) {
+        cout<<"YES\n";
+        cout<<ans.size()<<endl;
+        cout<<ans<<endl;
+    }
+    else {
+        cout<<"NO\n";
+    }
+}
+
+
+signed main (){ 
+    // ios_base:: sync_with_stdio(false);cin.tie(0);cout.tie(0);
+    //freopen( "input.txt", "r", stdin);
+    //freopen( "output.txt", "w", stdout);
+    // #ifdef SIEVE
+    //     sieve();
+    // #endif
+    // #ifdef NCR 
+    //     init() ;
+    // #endif
+    int t=1;
+    seiv();
+    // cin >> t;
+    FRj(t) 
+        SAKSHAM(j);
+     // cerr << "\n" << (double)clock() / CLOCKS_PER_SEC * 1000 << " ms";
+    return 0;
+}
+
+
+
+
